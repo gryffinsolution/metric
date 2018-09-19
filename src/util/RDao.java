@@ -163,7 +163,7 @@ public class RDao {
 	public void getLastCollectionTimeNisCustom(Connection conR,
 			ArrayList<String> hosts, HashMap<String, String> hostKVtime,
 			HashMap<String, Boolean> hostKVisCustom, String customCategory1st,
-			Long baseMinusSecFrConf) {
+			Long baseMinusSecFrConf, HashMap<String, Boolean> isV3) {
 		Statement stmt;
 		try {
 			for (String host : hosts) {
@@ -276,5 +276,26 @@ public class RDao {
 			}
 			pst = null;
 		}
+	}
+
+	public HashMap<String, Boolean> getV3Info(Connection conn) {
+		HashMap<String, Boolean> isV3 = new HashMap<String, Boolean>();
+		Statement stmt;
+		try {
+			String sql = "SELECT DISTINCT HOSTNAME,IS_V3 FROM HOST_INFOS WHERE IS_V3=1 ";
+			LOG.info(sql);
+			;
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				String host = rs.getString("HOSTNAME");
+				isV3.put(host, true);
+			}
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			printSQLException(e);
+		}
+		return isV3;
 	}
 }

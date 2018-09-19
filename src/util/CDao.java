@@ -34,9 +34,12 @@ public class CDao {
 
 	}
 
-	public long getEpTime(String strdate) {
+	public long getEpTime(String strdate, boolean isV3) {
 		try {
 			LOG.info(strdate);
+			if (isV3 = true) {
+				return Long.parseLong(strdate);
+			}
 			SimpleDateFormat formatter = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss.sss", Locale.ENGLISH);
 			Date date = formatter.parse(strdate);
@@ -48,7 +51,8 @@ public class CDao {
 		}
 	}
 
-	public boolean insertMetric(String host, String message, String TTL) {
+	public boolean insertMetric(String host, String message, String TTL,
+			boolean isV3Flag) {
 		LOG.info("input=" + message + ":");
 
 		// CPU
@@ -64,7 +68,7 @@ public class CDao {
 						StringBuffer sbValue = new StringBuffer("");
 
 						String[] items = cpuOneLine.split(",,");
-						long epTime = getEpTime(items[0]);
+						long epTime = getEpTime(items[0], isV3Flag);
 						if (items.length <= 0 || epTime < 0) {
 							LOG.error("1st Value is not EpochTime in "
 									+ cpuLines);
@@ -122,7 +126,7 @@ public class CDao {
 						StringBuffer sbValue = new StringBuffer("");
 
 						String[] items = cpuLoadOneLine.split(",,");
-						long epTime = getEpTime(items[0]);
+						long epTime = getEpTime(items[0], isV3Flag);
 						if (items.length <= 0 || epTime < 0) {
 							LOG.error("1st value is not EpochTime in "
 									+ cpuLoadOneLine);
@@ -176,7 +180,8 @@ public class CDao {
 						StringBuffer sbValue = new StringBuffer("");
 
 						String[] items = memOneLine.split(",,");
-						long epTime = getEpTime(items[0]);
+
+						long epTime = getEpTime(items[0], isV3Flag);
 						if (items.length <= 0 || epTime < 0) {
 							LOG.error("1st value is not EpochTime in "
 									+ memOneLine);
@@ -235,7 +240,7 @@ public class CDao {
 						StringBuffer sbValue = new StringBuffer("");
 
 						String[] items = diskOneLine.split(",,");
-						long epTime = getEpTime(items[0]);
+						long epTime = getEpTime(items[0], isV3Flag);
 						if (items.length <= 0 || epTime < 0) {
 							LOG.error("1st value is not EpochTime in "
 									+ diskOneLine);
@@ -291,7 +296,7 @@ public class CDao {
 						StringBuffer sbValue = new StringBuffer("");
 
 						String[] items = disk_ioOneLine.split(",,");
-						long epTime = getEpTime(items[0]);
+						long epTime = getEpTime(items[0], isV3Flag);
 						if (items.length <= 0 || epTime < 0) {
 							LOG.error("1st value is not EpochTime in "
 									+ disk_ioOneLine);
@@ -351,7 +356,7 @@ public class CDao {
 						StringBuffer sbValue = new StringBuffer("");
 
 						String[] items = netOneLine.split(",,");
-						long epTime = getEpTime(items[0]);
+						long epTime = getEpTime(items[0], isV3Flag);
 						if (items.length <= 0 || epTime < 0) {
 							LOG.error("1st value is not EpochTime in "
 									+ netOneLine);
@@ -422,7 +427,7 @@ public class CDao {
 							StringBuffer sbValue = new StringBuffer("");
 
 							String[] items = processCpuOneLine.split(",,");
-							long epTime = getEpTime(items[0]);
+							long epTime = getEpTime(items[0], isV3Flag);
 							if (items.length <= 0 || epTime < 0) {
 								LOG.error("1st value is not EpochTime in "
 										+ processCpuOneLine);
@@ -482,7 +487,7 @@ public class CDao {
 								StringBuffer sbValue = new StringBuffer("");
 
 								String[] items = nfsOneLine.split(",,");
-								long epTime = getEpTime(items[0]);
+								long epTime = getEpTime(items[0], isV3Flag);
 								if (items.length <= 0 || epTime < 0) {
 									LOG.error("1st value is not EpochTime in "
 											+ nfsOneLine);

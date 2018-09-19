@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import util.ADao;
+import util.ASao;
 import util.CDao;
 import util.Conf;
 import util.RDao;
@@ -64,6 +65,7 @@ public class MetricMgr {
 		RDao rDao = new RDao();
 		Connection conn = rDao.getConnection(rdbUrl, rdbUser, rdbPasswd);
 		ArrayList<String> hosts = rDao.getHostsMT(conn, thNo, thAll, sql);
+		HashMap<String, Boolean> isV3 = rDao.getV3Info(conn);
 
 		// ArrayList<String> hosts = rDao.getHostsTest("localhost");
 		// rDao.setCollectionTimeStampTest(conn, rdbUrl, thNo, "localhost");
@@ -72,10 +74,11 @@ public class MetricMgr {
 		HashMap<String, Boolean> hostKVisCustom = new HashMap<String, Boolean>();
 
 		rDao.getLastCollectionTimeNisCustom(conn, hosts, hostKVtime,
-				hostKVisCustom, customCategory1st, baseMinusSecFrConf);
+				hostKVisCustom, customCategory1st, baseMinusSecFrConf, isV3);
 
 		int i = 0;
 		ADao adao = new ADao();
+		ASao asao = new ASao();
 		for (String host : hosts) {
 			LOG.trace(thNo + "-" + i + ":Checking:" + host);
 			i++;
@@ -83,8 +86,13 @@ public class MetricMgr {
 			String line = null;
 			rDao.setCollectionStartTimestamp(conn, rdbUrl, thNo, host);
 			try {
-				line = adao.getMetricsNT(agentPort, host, hostKVtime.get(host),
-						hostKVisCustom.get(host));
+				if (isV3.containsKey(host) && isV3.get(host)) {
+					line = asao.getMetricsNTget(agentPort, host,
+							hostKVtime.get(host), hostKVisCustom.get(host));
+				} else {
+					line = adao.getMetricsNT(agentPort, host,
+							hostKVtime.get(host), hostKVisCustom.get(host));
+				}
 				LOG.info("FINAL=" + line);
 			} catch (NullPointerException e) {
 				LOG.error("host(" + host + ") output is null");
@@ -95,7 +103,12 @@ public class MetricMgr {
 			long elapsedSecInt = (elapsedT.getMillis() / 1000);
 
 			if (line != null && line.length() > 100) {
-				if (!cdao.insertMetric(host, line, TTL)) {
+				boolean isV3flag = false;
+				if (isV3.containsKey(host) && isV3.get(host)) {
+					isV3flag = true;
+				}
+
+				if (!cdao.insertMetric(host, line, TTL, isV3flag)) {
 					LOG.error("metricInsertError2Cassandra=" + host);
 				}
 				rDao.setCollectionEndTimestamp(conn, rdbUrl, thNo, host,
@@ -103,6 +116,7 @@ public class MetricMgr {
 			} else {
 				if (line == null)
 					LOG.info(host + " agent is not working");
+				// TODO: make err ?
 				else if (line.length() <= 100)
 					LOG.info(host + " no data");
 			}
