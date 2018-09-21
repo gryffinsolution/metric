@@ -187,21 +187,35 @@ public class RDao {
 					}
 					Timestamp tsNow = new Timestamp(System.currentTimeMillis());
 					long timediff = tsNow.getTime() - tsLastTimeatDB.getTime();
-					LOG.info("timediff=" + timediff);
+					LOG.info("timediff_ms=" + timediff);
 					if (timediff > baseMinusSecFrConf * 1000L) {
 						tsLastTimeatDB.setTime(tsNow.getTime()
 								- baseMinusSecFrConf * 1000L);
 						String strCollTime = new SimpleDateFormat(
 								"yyyy-MM-dd HH:mm:ss.sss")
 								.format(tsLastTimeatDB);
-						hostKVtime.put(host, strCollTime);
-						LOG.info(host + "<=" + strCollTime);
+						if (isV3.containsKey(host) && isV3.get(host)) {
+							hostKVtime.put(host, tsLastTimeatDB.getTime()
+									/ 1000L + "");
+							LOG.info(host + "<=" + tsLastTimeatDB.getTime()
+									/ 1000L + "");
+						} else {
+							hostKVtime.put(host, strCollTime);
+							LOG.info(host + "<=" + strCollTime);
+						}
 					} else {
 						String strCollTime = new SimpleDateFormat(
 								"yyyy-MM-dd HH:mm:ss.sss")
 								.format(tsLastTimeatDB);
-						hostKVtime.put(host, strCollTime);
-						LOG.info(host + "==" + strCollTime);
+						if (isV3.containsKey(host) && isV3.get(host)) {
+							hostKVtime.put(host, tsLastTimeatDB.getTime()
+									/ 1000L + "");
+							LOG.info(host + "==" + tsLastTimeatDB.getTime()
+									/ 1000L + "");
+						} else {
+							hostKVtime.put(host, strCollTime);
+							LOG.info(host + "==" + strCollTime);
+						}
 					}
 
 					String cate_1st = rs.getString("CATEGORY_1ST");

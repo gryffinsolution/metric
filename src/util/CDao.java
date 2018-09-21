@@ -527,7 +527,7 @@ public class CDao {
 								}
 							}
 						} catch (ArrayIndexOutOfBoundsException e) {
-							LOG.info("Array Out:" + nfsOneLine);
+							LOG.error("Array Out:" + nfsOneLine);
 							return false;
 						} catch (NumberFormatException e) {
 							LOG.error("NumberFormatException:" + nfsOneLine);

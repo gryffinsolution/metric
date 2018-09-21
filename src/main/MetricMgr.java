@@ -1,5 +1,7 @@
 package main;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,6 +9,7 @@ import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -31,8 +34,10 @@ public class MetricMgr {
 
 	public static void main(String[] args) {
 
+		RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
+		String pid = rt.getName();
+		ThreadContext.put("PID", pid);
 		DateTime start = new DateTime();
-
 		Conf cf = new Conf();
 		if (args.length != 0 && args[0] != null) {
 			cf.setConfFile(args[0]);
@@ -61,21 +66,16 @@ public class MetricMgr {
 		CDao cdao = new CDao();
 		cdao.connect(seeds);
 		String TTL = cf.getSingleString("TTL_Second");
-
 		RDao rDao = new RDao();
 		Connection conn = rDao.getConnection(rdbUrl, rdbUser, rdbPasswd);
 		ArrayList<String> hosts = rDao.getHostsMT(conn, thNo, thAll, sql);
+		// ArrayList<String> hosts = rDao.getHostsTest();
 		HashMap<String, Boolean> isV3 = rDao.getV3Info(conn);
-
-		// ArrayList<String> hosts = rDao.getHostsTest("localhost");
-		// rDao.setCollectionTimeStampTest(conn, rdbUrl, thNo, "localhost");
-
 		HashMap<String, String> hostKVtime = new HashMap<String, String>();
 		HashMap<String, Boolean> hostKVisCustom = new HashMap<String, Boolean>();
-
+		
 		rDao.getLastCollectionTimeNisCustom(conn, hosts, hostKVtime,
 				hostKVisCustom, customCategory1st, baseMinusSecFrConf, isV3);
-
 		int i = 0;
 		ADao adao = new ADao();
 		ASao asao = new ASao();
@@ -117,8 +117,9 @@ public class MetricMgr {
 				if (line == null)
 					LOG.info(host + " agent is not working");
 				// TODO: make err ?
-				else if (line.length() <= 100)
+				else if (line.length() <= 100) {
 					LOG.info(host + " no data");
+				}
 			}
 			DateTime end = new DateTime();
 			Duration elapsedTime = new Duration(start, end);
