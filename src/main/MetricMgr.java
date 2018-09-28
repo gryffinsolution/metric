@@ -46,11 +46,6 @@ public class MetricMgr {
 			System.exit(0);
 		}
 
-		//
-		//
-		//
-		//
-
 		String rdbUrl = cf.getDbURL();
 		String rdbUser = cf.getSingleString("user");
 		String rdbPasswd = cf.getSingleString("password");
