@@ -18,8 +18,9 @@ public class ASao {
 	public String getMetricsNTget(int port, String host, String strTime,
 			boolean custom) {
 
-		String url = "http://" + host + ":" + port + "/getmetrics?strdate="+strTime;
-		LOG.info("URL="+url);
+		String url = "http://" + host + ":" + port + "/getmetrics?strdate="
+				+ strTime;
+		LOG.info("URL=" + url);
 		HttpURLConnection con = null;
 		try {
 			URL myurl = new URL(url);
@@ -58,5 +59,5 @@ public class ASao {
 		} finally {
 			con.disconnect();
 		}
-	}	
+	}
 }

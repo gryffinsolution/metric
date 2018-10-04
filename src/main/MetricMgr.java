@@ -17,6 +17,7 @@ import util.ADao;
 import util.ASao;
 import util.CDao;
 import util.Conf;
+import util.License;
 import util.RDao;
 
 public class MetricMgr {
@@ -33,7 +34,6 @@ public class MetricMgr {
 	}
 
 	public static void main(String[] args) {
-
 		RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
 		String pid = rt.getName();
 		ThreadContext.put("PID", pid);
@@ -44,6 +44,17 @@ public class MetricMgr {
 		} else {
 			LOG.error("there is no config.xml as a args[0]");
 			System.exit(0);
+		}
+		License lic = new License();
+		if (lic.isValid(cf.getSingleString("lic_key_file"))) {
+			LOG.info("license confirmed");
+		} else {
+			if (cf.getSingleString("force_mode").matches("dev")) {
+				LOG.info("develop mode. license check waived");
+			} else {
+				LOG.fatal("license is not valid");
+				System.exit(0);
+			}
 		}
 
 		String rdbUrl = cf.getDbURL();
@@ -68,7 +79,7 @@ public class MetricMgr {
 		HashMap<String, Boolean> isV3 = rDao.getV3Info(conn);
 		HashMap<String, String> hostKVtime = new HashMap<String, String>();
 		HashMap<String, Boolean> hostKVisCustom = new HashMap<String, Boolean>();
-		
+
 		rDao.getLastCollectionTimeNisCustom(conn, hosts, hostKVtime,
 				hostKVisCustom, customCategory1st, baseMinusSecFrConf, isV3);
 		int i = 0;

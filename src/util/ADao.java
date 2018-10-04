@@ -65,7 +65,7 @@ public class ADao {
 			DriverManager.setLoginTimeout(1);
 
 			s = conn.createStatement();
-			
+
 			// CPU
 			String sql = "SELECT TIME,CPU_IRQ,CPU_NICE,CPU_SOFTIRQ,CPU_SYSTEM,CPU_IOWAIT,CPU_USER "
 					+ "FROM CPU WHERE TIME>=TIMESTAMP('" + strTime + "') ";
