@@ -3,7 +3,6 @@ package main;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,16 +21,6 @@ import util.RDao;
 
 public class MetricMgr {
 	private static final Logger LOG = LogManager.getLogger(MetricMgr.class);
-
-	public static void printSQLException(SQLException e) {
-		while (e != null) {
-			LOG.error("\n----- SQLException -----");
-			LOG.error("  SQL State:  " + e.getSQLState());
-			LOG.error("  Error Code: " + e.getErrorCode());
-			LOG.error("  Message:    " + e.getMessage());
-			e = e.getNextException();
-		}
-	}
 
 	public static void main(String[] args) {
 		RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
